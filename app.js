@@ -1,3 +1,21 @@
+require("log-node")();
+
+const port = 8000;
+const express = require('express');
+const log = require('log');
+
+
+
+const app = express();
+
+log.debug("Log level debug");
+log.info("Log level info");
+log.notice("Log level notice");
+log.error("Log level error");
+log.warning("Log level warning");
+
+
+
 async function quickstart() {
     // Imports the Google Cloud client library
     const vision = require('@google-cloud/vision');
@@ -12,4 +30,17 @@ async function quickstart() {
     labels.forEach(label => console.log(label.description));
 }
 
-quickstart()
+// POST /lable?location=lat,long
+// BODY: jpg image compressed
+app.post('/lable', function (req, res) {
+    log.debug("Received request POST /lable");
+    let location = req.query.location.split(',');
+    location[0] = Number(location[0]);
+    location[1] = Number(location[1]);
+  res.send('hello world')
+});
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+// quickstart();
+
