@@ -17,37 +17,33 @@ log.error("Log level error");
 log.warning("Log level warning");
 */
 
-async function quickstart() {
-    // Imports the Google Cloud client library
+// img: string or Buffer
+async function quickstart(img) {
+    ret = {};
+    ret['labels'] = [];
+    ret['logos'] = [];
     const vision = require('@google-cloud/vision');
 
-    // Creates a client
     const client = new vision.ImageAnnotatorClient();
-
-    // Performs label detection on the image file
-    img = './imgs/milk.jpg';
 
     const [logo_result] = await client.logoDetection(img);
     const logos = logo_result.logoAnnotations;
-    console.log('Logos:');
-    logos.forEach(logo => console.log(logo.description));
-    console.log();
+    logos.forEach(logo => {
+        log.debug(`Got logo ${logo.description}`);
+        ret['logos'].push(logo.description);
+    });
 
     const [label_result] = await client.labelDetection(img);
     var labels = label_result.labelAnnotations;
-    labels = labels.filter(label => filt(label));
-    console.log('Labels:');
-    labels.forEach(label => console.log(label.description));
+    labels = labels.filter(label => {
+        log.debug(`Got label ${label.description}`);
+        if (filt(label)) {
+            log.debug(`${label.description} passes filter`);
+            ret['labels'].push(label.description);
+        }
+    });
 
-    // const [ob_result] = await client.objectLocalization(img);
-    // const objects = ob_result.localizedObjectAnnotations;
-
-    // objects.forEach(object => {
-    //     log.info(`Name: ${object.name}`);
-    //     log.info(`Confidence: ${object.score}`);
-    // })
-    // console.log('First of Labels: ');
-    // console.log(getFirst(labels).description)
+    return ret;
 }
 
 // POST /label?location=lat,long
@@ -62,11 +58,11 @@ app.post('/label', rawBodyParser, function (req, res) {
     let location = req.query.location.split(',');
     location[0] = Number(location[0]);
     location[1] = Number(location[1]);
-    let imageData = req.body;
-    console.log(imageData);
-    res.send('hello world\n')
+    quickstart(req.body).then(labels => {
+        res.set('Content-Type', 'application/json');
+        res.send(JSON.stringify(labels));
+    });
 });
-
 
 // accepts label, returns boolean representing if name applicable
 function filt(a) {
@@ -81,5 +77,3 @@ function filt(a) {
 
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
-
-quickstart();
