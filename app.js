@@ -82,10 +82,9 @@ app.post('/label', rawBodyParser, function (req, res) {
     imageDetect(req.body).then(labels => {
         res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(labels));
+        res.send(verdict(labels["labels"]));    // pushback verdict to phone
         var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
-        var values = [buildValues(labels, location)];
-        console.log("is this on??");
-        log.debug(values);
+        var values = [buildValues(labels, location)];   // build values for database
         con.query(sql, [values], function (err, result) {
             if (err) throw err;
             console.log("Number of records inserted: " + result.affectedRows);
@@ -95,7 +94,7 @@ app.post('/label', rawBodyParser, function (req, res) {
 
 // accepts label, returns boolean representing if name applicable
 function filt(a) {
-    keywords = ["can", "bottle", "glass", "plastic"];
+    keywords = ["can", "bottle", "glass", "plastic", "cardboard", "cleaning", "beer", "book"];
     for (i = 0; i < keywords.length; i++) {
         if (a.description.toLowerCase().includes(keywords[i])) {
             return true;
@@ -131,4 +130,35 @@ function addValues(dl, values) {
     }
 }
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+// accepts list of labels, returns boolean value representing recyclability
+function verdict(labels) {
+    if (labels.length == 0) {
+        return false;
+    }
+    if (labels.indexOf("plastic") & !labels.indexOf("bottle")) {
+        return false;
+    }
+    return true;
+}
+
+
+
+// app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+// function fakelaunch(img) {
+//     location = [0, 1];
+//     imageDetect(img).then(labels => {
+//         // res.set('Content-Type', 'application/json');
+//         // res.send(JSON.stringify(labels));
+//         var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
+//         var values = [buildValues(labels, location)];
+//         console.log(verdict(labels["labels"]));
+//         // con.query(sql, [values], function (err, result) {
+//         //     if (err) throw err;
+//         //     console.log("Number of records inserted: " + result.affectedRows);
+//         // });
+//     });
+// }
+
+// img = "imgs/plastic.jpg";
+// fakelaunch(img);
