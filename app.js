@@ -9,6 +9,20 @@ const app = express();
 
 const rawBodyParser = bodyParser.raw({"type": "image/jpeg"});
 
+const mysql = require('mysql');
+
+const con = mysql.createConnection({
+    host: "34.68.221.19",
+    user: "root",
+    password: "password",
+    database: "recyclevision"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
 /*
 log.debug("Log level debug");
 log.info("Log level info");
@@ -21,6 +35,7 @@ log.warning("Log level warning");
 async function quickstart(img) {
     ret = {};
     ret['labels'] = [];
+    ret['confidence'] = [];
     ret['logos'] = [];
     const vision = require('@google-cloud/vision');
 
@@ -40,9 +55,9 @@ async function quickstart(img) {
         if (filt(label)) {
             log.debug(`${label.description} passes filter`);
             ret['labels'].push(label.description);
+            ret['confidence'].push(1);  // FILL ME OUT
         }
     });
-
     return ret;
 }
 
@@ -61,6 +76,14 @@ app.post('/label', rawBodyParser, function (req, res) {
     quickstart(req.body).then(labels => {
         res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(labels));
+
+        var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
+        var values = [[location[0], location[1], labels['labels'][0], labels['labels'][1], labels['labels'][2], labels['confidence'][0], labels['confidence'][1], labels['confidence'][2], "Fake Logo"]
+        ];
+        con.query(sql, [values], function (err, result) {
+          if (err) throw err;
+          console.log("Number of records inserted: " + result.affectedRows);
+        });
     });
 });
 
