@@ -57,7 +57,7 @@ async function quickstart(img) {
             if (filt(label)) {
                 log.debug(`${label.description} passes filter`);
                 ret['labels'].push(label.description);
-                ret['confidence'].push(1);  // FILL ME OUT
+                ret['confidence'].push(label.score);  // FILL ME OUT
             }
         });
     }
