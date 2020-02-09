@@ -1,0 +1,109 @@
+/* Nav */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 93.33%;
+
+
+
+/* Group 3 */
+
+position: absolute;
+width: 820px;
+height: 822.45px;
+
+
+
+/* Path */
+
+position: absolute;
+width: 1315px;
+height: 1025px;
+
+background: #FBFBFB;
+mix-blend-mode: normal;
+opacity: 0.5;
+
+
+/* Path */
+
+position: absolute;
+width: 1395px;
+height: 1087px;
+
+background: #FBFBFB;
+mix-blend-mode: normal;
+opacity: 0.5;
+transform: rotate(9.67deg);
+
+
+/* BG */
+
+position: absolute;
+left: 0px;
+right: 0px;
+top: 0px;
+bottom: 0px;
+
+background: #2D5D88;
+border-radius: 2px;
+
+
+/* Button Label */
+
+position: absolute;
+width: 160px;
+height: 18px;
+
+font-family: Myanmar Khyay;
+font-style: normal;
+font-weight: normal;
+font-size: 12px;
+line-height: 18px;
+/* identical to box height, or 150% */
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Landie */
+
+position: absolute;
+width: 89px;
+height: 38px;
+
+font-family: Myanmar Khyay;
+font-style: normal;
+font-weight: normal;
+font-size: 26px;
+line-height: 38px;
+/* identical to box height, or 146% */
+
+color: #2D5D88;
+
+
+
+/* Text Block */
+
+position: relative;
+width: 539.37px;
+height: 316px;
+
+
+
+/* Element/Button/Large/Filled */
+
+position: relative;
+width: 189.13px;
+height: 36px;
+
+
+
+/* Element/Button/Large/Filled Copy */
+
+position: relative;
+width: 189.13px;
+height: 36px;
