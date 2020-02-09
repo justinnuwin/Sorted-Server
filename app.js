@@ -47,7 +47,7 @@ async function imageDetect(img) {
     if (logos) {
         logos.forEach(logo => {
             log.debug(`Got logo ${logo.description}`);
-            ret['logos'].push(logo.description);
+            ret['logos'].push(logo.description.toLowerCase());
         });
     }
     const [label_result] = await client.labelDetection(img);
@@ -57,7 +57,7 @@ async function imageDetect(img) {
             log.debug(`Got label ${label.description}`);
             if (filt(label)) {
                 log.debug(`${label.description} passes filter`);
-                ret['labels'].push(label.description);
+                ret['labels'].push(label.description.toLowerCase());
                 ret['confidence'].push(label.score);
             }
         });
@@ -82,7 +82,7 @@ app.post('/label', rawBodyParser, function (req, res) {
     imageDetect(req.body).then(labels => {
         res.set('Content-Type', 'application/json');
         log.debug(verdict(labels["labels"]));
-        res.send(JSON.stringify({"isRecycleable": verdict(labels["labels"]), "labels": labels["labels"]}));
+        res.send(JSON.stringify({ "isRecycleable": verdict(labels["labels"]), "labels": labels["labels"] }));
         var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
         var values = [buildValues(labels, location)];   // build values for database
         con.query(sql, [values], function (err, result) {
@@ -135,10 +135,7 @@ function verdict(labels) {
     if (labels.length == 0) {
         return false;
     }
-    if (labels.indexOf("plastic".toLowerCase()) & !labels.indexOf("bottle".toLowerCase())) {
-        return false;
-    }
-    return true;
+    return (labels.indexOf("Plastic".toLowerCase()) != -1 && labels.indexOf("bottle".toLowerCase()) == -1) ? false : true
 }
 
 
