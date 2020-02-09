@@ -81,9 +81,8 @@ app.post('/label', rawBodyParser, function (req, res) {
     location[1] = Number(location[1]);
     imageDetect(req.body).then(labels => {
         res.set('Content-Type', 'application/json');
-        res.send(JSON.stringify(labels));
         log.debug(verdict(labels["labels"]));
-        res.send([verdict(labels["labels"]), labels["labels"]]);    // pushback verdict to phone
+        res.send(JSON.stringify({"isRecycleable": verdict(labels["labels"]), "labels": labels["labels"]}));
         var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
         var values = [buildValues(labels, location)];   // build values for database
         con.query(sql, [values], function (err, result) {
