@@ -30,10 +30,10 @@ async function quickstart() {
     labels.forEach(label => console.log(label.description));
 }
 
-// POST /lable?location=lat,long
+// POST /label?location=lat,long
 // BODY: jpg image compressed
-app.post('/lable', function (req, res) {
-    log.debug("Received request POST /lable");
+app.post('/label', function (req, res) {
+    log.debug("Received request POST /label");
     let location = req.query.location.split(',');
     location[0] = Number(location[0]);
     location[1] = Number(location[1]);
