@@ -143,7 +143,7 @@ function verdict(labels) {
 
 
 
-// app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 // function fakelaunch(img) {
 //     location = [0, 1];
