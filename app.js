@@ -7,7 +7,7 @@ const log = require('log');
 
 const app = express();
 
-const rawBodyParser = bodyParser.raw({"type": "image/jpeg", "limit": "50mb"});
+const rawBodyParser = bodyParser.raw({ "type": "image/jpeg", "limit": "50mb" });
 
 const mysql = require('mysql');
 
@@ -18,7 +18,7 @@ const con = mysql.createConnection({
     database: "recyclevision"
 });
 
-con.connect(function(err) {
+con.connect(function (err) {
     if (err) throw err;
     console.log("Connected!");
 });
@@ -43,21 +43,24 @@ async function quickstart(img) {
 
     const [logo_result] = await client.logoDetection(img);
     const logos = logo_result.logoAnnotations;
-    logos.forEach(logo => {
-        log.debug(`Got logo ${logo.description}`);
-        ret['logos'].push(logo.description);
-    });
-
+    if (logos) {
+        logos.forEach(logo => {
+            log.debug(`Got logo ${logo.description}`);
+            ret['logos'].push(logo.description);
+        });
+    }
     const [label_result] = await client.labelDetection(img);
     var labels = label_result.labelAnnotations;
-    labels = labels.filter(label => {
-        log.debug(`Got label ${label.description}`);
-        if (filt(label)) {
-            log.debug(`${label.description} passes filter`);
-            ret['labels'].push(label.description);
-            ret['confidence'].push(1);  // FILL ME OUT
-        }
-    });
+    if (labels) {
+        labels = labels.filter(label => {
+            log.debug(`Got label ${label.description}`);
+            if (filt(label)) {
+                log.debug(`${label.description} passes filter`);
+                ret['labels'].push(label.description);
+                ret['confidence'].push(1);  // FILL ME OUT
+            }
+        });
+    }
     return ret;
 }
 
@@ -81,8 +84,8 @@ app.post('/label', rawBodyParser, function (req, res) {
         var values = [[location[0], location[1], labels['labels'][0], labels['labels'][1], labels['labels'][2], labels['confidence'][0], labels['confidence'][1], labels['confidence'][2], "Fake Logo"]
         ];
         con.query(sql, [values], function (err, result) {
-          if (err) throw err;
-          console.log("Number of records inserted: " + result.affectedRows);
+            if (err) throw err;
+            console.log("Number of records inserted: " + result.affectedRows);
         });
     });
 });
@@ -97,6 +100,5 @@ function filt(a) {
     }
     return false;
 }
-
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
