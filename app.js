@@ -32,7 +32,8 @@ log.warning("Log level warning");
 */
 
 // img: string or Buffer
-async function quickstart(img) {
+// takes image, returns dictionary of applicable labels
+async function imageDetect(img) {
     ret = {};
     ret['labels'] = [];
     ret['confidence'] = [];
@@ -57,7 +58,7 @@ async function quickstart(img) {
             if (filt(label)) {
                 log.debug(`${label.description} passes filter`);
                 ret['labels'].push(label.description);
-                ret['confidence'].push(label.score);  // FILL ME OUT
+                ret['confidence'].push(label.score);
             }
         });
     }
@@ -66,6 +67,8 @@ async function quickstart(img) {
 
 // POST /label?location=lat,long
 // BODY: jpg image compressed
+// handler for post to app
+// called each time an image is sent
 app.post('/label', rawBodyParser, function (req, res) {
     log.debug(`Received request POST ${req.originalUrl}`);
     if (Object.keys(req.query).indexOf('location') == -1) {
@@ -76,13 +79,13 @@ app.post('/label', rawBodyParser, function (req, res) {
     let location = req.query.location.split(',');
     location[0] = Number(location[0]);
     location[1] = Number(location[1]);
-    quickstart(req.body).then(labels => {
+    imageDetect(req.body).then(labels => {
         res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(labels));
-
         var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
-        var values = [[location[0], location[1], labels['labels'][0], labels['labels'][1], labels['labels'][2], labels['confidence'][0], labels['confidence'][1], labels['confidence'][2], "Fake Logo"]
-        ];
+        var values = [buildValues(labels, location)];
+        console.log("is this on??");
+        log.debug(values);
         con.query(sql, [values], function (err, result) {
             if (err) throw err;
             console.log("Number of records inserted: " + result.affectedRows);
@@ -99,6 +102,33 @@ function filt(a) {
         }
     }
     return false;
+}
+
+// accepts a dictionary and location data, builds the data packet to send to mysql
+function buildValues(dp, loc) {
+    var values = [];
+    values.push(loc[0]);
+    values.push(loc[1]);
+    addValues(dp["labels"], values);
+    addValues(dp["confidence"], values);
+    if (dp["logos"].length > 0) {
+        values.push(dp["logos"][0]);
+    } else {
+        values.push("");
+    }
+    return values;
+}
+
+// accepts data location and array to place, places data in array
+// also protects for index errors, filling in empty entries with ""
+function addValues(dl, values) {
+    for (i = 0; i < 3; i++) {
+        if (i < dl.length) {
+            values.push(dl[i]);
+        } else {
+            values.push("");
+        }
+    }
 }
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
