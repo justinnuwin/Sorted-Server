@@ -7,7 +7,7 @@ const log = require('log');
 
 const app = express();
 
-const rawBodyParser = bodyParser.raw({"type": "image/jpeg"});
+const rawBodyParser = bodyParser.raw({"type": "image/jpeg", "limit": "50mb"});
 
 const mysql = require('mysql');
 
