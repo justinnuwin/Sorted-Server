@@ -135,7 +135,7 @@ function verdict(labels) {
     if (labels.length == 0) {
         return false;
     }
-    return (labels.indexOf("Plastic".toLowerCase()) != -1 && labels.indexOf("bottle".toLowerCase()) == -1) ? false : true
+    return (labels.indexOf("plastic".toLowerCase()) != -1 && labels.indexOf("bottle".toLowerCase()) == -1) ? false : true
 }
 
 
