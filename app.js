@@ -82,7 +82,8 @@ app.post('/label', rawBodyParser, function (req, res) {
     imageDetect(req.body).then(labels => {
         res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(labels));
-        res.send(verdict(labels["labels"]));    // pushback verdict to phone
+        log.debug(verdict(labels["labels"]));
+        res.send([verdict(labels["labels"]), labels["labels"]]);    // pushback verdict to phone
         var sql = "INSERT INTO analytics (Latitude, Longitude, Label1, Label2, Label3, Confidence1, Confidence2, Confidence3, Logo) VALUES ?";
         var values = [buildValues(labels, location)];   // build values for database
         con.query(sql, [values], function (err, result) {
@@ -135,7 +136,7 @@ function verdict(labels) {
     if (labels.length == 0) {
         return false;
     }
-    if (labels.indexOf("plastic") & !labels.indexOf("bottle")) {
+    if (labels.indexOf("plastic".toLowerCase()) & !labels.indexOf("bottle".toLowerCase())) {
         return false;
     }
     return true;
