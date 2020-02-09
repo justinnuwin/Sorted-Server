@@ -24,30 +24,31 @@ async function quickstart() {
     const client = new vision.ImageAnnotatorClient();
 
     // Performs label detection on the image file
-    img = './imgs/egg carton 3.jpg';
+    img = './imgs/milk.jpg';
 
     const [logo_result] = await client.logoDetection(img);
     const logos = logo_result.logoAnnotations;
     console.log('Logos:');
     logos.forEach(logo => console.log(logo.description));
-
-    console.log()
+    console.log();
 
     const [label_result] = await client.labelDetection(img);
-    const labels = label_result.labelAnnotations;
+    var labels = label_result.labelAnnotations;
+    labels = labels.filter(label => filt(label));
     console.log('Labels:');
     labels.forEach(label => console.log(label.description));
 
-    const [ob_result] = await client.objectLocalization(img);
-    const objects = ob_result.localizedObjectAnnotations;
+    // const [ob_result] = await client.objectLocalization(img);
+    // const objects = ob_result.localizedObjectAnnotations;
 
-    objects.forEach(object =>
-        console.log(object.))
+    // objects.forEach(object => {
+    //     log.info(`Name: ${object.name}`);
+    //     log.info(`Confidence: ${object.score}`);
+    // })
     // console.log('First of Labels: ');
     // console.log(getFirst(labels).description)
 }
 
-<<<<<<< Updated upstream
 // POST /lable?location=lat,long
 // BODY: jpg image compressed
 app.post('/lable', function (req, res) {
@@ -55,23 +56,21 @@ app.post('/lable', function (req, res) {
     let location = req.query.location.split(',');
     location[0] = Number(location[0]);
     location[1] = Number(location[1]);
-  res.send('hello world')
+    res.send('hello world');
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+// app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
-// quickstart();
-
-=======
-// accepts list, returns highest match, throws error if list empty
-function getFirst(a) {
-    try {
-        return a[0];
-    } catch (err) {
-        console.log('No labels detected');
+// accepts label, returns boolean representing if name applicable
+function filt(a) {
+    keywords = ["can", "bottle", "glass", "plastic"];
+    for (i = 0; i < keywords.length; i++) {
+        if (a.description.toLowerCase().includes(keywords[i])) {
+            return true;
+        }
     }
+    return false;
 }
 
 
-quickstart()
->>>>>>> Stashed changes
+quickstart();
