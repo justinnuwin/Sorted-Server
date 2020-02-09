@@ -62,7 +62,9 @@ app.post('/label', rawBodyParser, function (req, res) {
     let location = req.query.location.split(',');
     location[0] = Number(location[0]);
     location[1] = Number(location[1]);
-    res.send('hello world');
+    let imageData = req.body;
+    console.log(imageData);
+    res.send('hello world\n')
 });
 
 
@@ -76,11 +78,8 @@ function filt(a) {
     }
     return false;
 }
-    let imageData = req.body;
-    console.log(imageData);
-    res.send('hello world\n')
-});
 
 
-// app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
 quickstart();
